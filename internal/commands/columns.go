@@ -19,6 +19,23 @@ var (
 		{Header: "Name", Field: "name"},
 	}
 
+	epicColumns = render.Columns{
+		{Header: "ID", Field: "id"},
+		{Header: "Name", Field: "name"},
+		{Header: "Status", Field: "derived_status"},
+		{Header: "Progress", Field: "progress.percent"},
+		{Header: "Wave", Field: "wave_id"},
+	}
+
+	waveColumns = render.Columns{
+		{Header: "ID", Field: "id"},
+		{Header: "Name", Field: "name"},
+		{Header: "Phase", Field: "phase"},
+		{Header: "Status", Field: "derived_status"},
+		{Header: "Start", Field: "start_date"},
+		{Header: "Target", Field: "target_date"},
+	}
+
 	stepColumns = render.Columns{
 		{Header: "ID", Field: "id"},
 		{Header: "Content", Field: "content"},

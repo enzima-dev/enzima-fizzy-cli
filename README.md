@@ -22,6 +22,18 @@
 - Token authentication via personal access tokens
 - Includes agent skill and Claude plugin setup
 
+## Enzima fork
+
+This fork adds commands for the resources that only exist in the
+[Enzima Fizzy fork](https://github.com/enzima-dev/enzima-fizzy):
+
+- `fizzy epic …` — list/show/create/update/delete epics, list an epic's cards,
+  add/remove a card to/from an epic
+- `fizzy wave …` — list/show/create/update/delete waves (Project › Wave › Epic › Card),
+  assign epics to a wave, change or advance its phase
+
+Install from source: `make build && cp bin/fizzy ~/.local/bin/fizzy`.
+
 ## Quick Start
 
 ```bash

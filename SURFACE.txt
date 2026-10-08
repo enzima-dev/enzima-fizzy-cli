@@ -13,6 +13,7 @@ ARG fizzy comment attachments help 00 [command]
 ARG fizzy comment help 00 [command]
 ARG fizzy completion 00 [bash|zsh|fish|powershell]
 ARG fizzy config help 00 [command]
+ARG fizzy epic help 00 [command]
 ARG fizzy help 00 [command]
 ARG fizzy identity help 00 [command]
 ARG fizzy migrate help 00 [command]
@@ -27,6 +28,7 @@ ARG fizzy tag help 00 [command]
 ARG fizzy token help 00 [command]
 ARG fizzy upload help 00 [command]
 ARG fizzy user help 00 [command]
+ARG fizzy wave help 00 [command]
 ARG fizzy webhook help 00 [command]
 CMD fizzy
 CMD fizzy account
@@ -140,6 +142,19 @@ CMD fizzy config help
 CMD fizzy config show
 CMD fizzy config view
 CMD fizzy doctor
+CMD fizzy epic
+CMD fizzy epic add-card
+CMD fizzy epic cards
+CMD fizzy epic create
+CMD fizzy epic delete
+CMD fizzy epic help
+CMD fizzy epic list
+CMD fizzy epic ls
+CMD fizzy epic remove-card
+CMD fizzy epic rm
+CMD fizzy epic show
+CMD fizzy epic update
+CMD fizzy epic view
 CMD fizzy help
 CMD fizzy identity
 CMD fizzy identity help
@@ -224,6 +239,17 @@ CMD fizzy user show
 CMD fizzy user update
 CMD fizzy user view
 CMD fizzy version
+CMD fizzy wave
+CMD fizzy wave create
+CMD fizzy wave delete
+CMD fizzy wave help
+CMD fizzy wave list
+CMD fizzy wave ls
+CMD fizzy wave phase
+CMD fizzy wave rm
+CMD fizzy wave show
+CMD fizzy wave update
+CMD fizzy wave view
 CMD fizzy webhook
 CMD fizzy webhook create
 CMD fizzy webhook delete
@@ -1001,6 +1027,7 @@ FLAG fizzy card create --count type=bool
 FLAG fizzy card create --created-at type=string
 FLAG fizzy card create --description type=string
 FLAG fizzy card create --description_file type=string
+FLAG fizzy card create --epic type=string
 FLAG fizzy card create --help type=bool
 FLAG fizzy card create --ids-only type=bool
 FLAG fizzy card create --image type=string
@@ -1013,6 +1040,7 @@ FLAG fizzy card create --quiet type=bool
 FLAG fizzy card create --styled type=bool
 FLAG fizzy card create --title type=string
 FLAG fizzy card create --token type=string
+FLAG fizzy card create --type type=string
 FLAG fizzy card create --verbose type=bool
 FLAG fizzy card delete --agent type=bool
 FLAG fizzy card delete --api-url type=string
@@ -1345,6 +1373,7 @@ FLAG fizzy card update --count type=bool
 FLAG fizzy card update --created-at type=string
 FLAG fizzy card update --description type=string
 FLAG fizzy card update --description_file type=string
+FLAG fizzy card update --epic type=string
 FLAG fizzy card update --help type=bool
 FLAG fizzy card update --ids-only type=bool
 FLAG fizzy card update --image type=string
@@ -1357,6 +1386,7 @@ FLAG fizzy card update --quiet type=bool
 FLAG fizzy card update --styled type=bool
 FLAG fizzy card update --title type=string
 FLAG fizzy card update --token type=string
+FLAG fizzy card update --type type=string
 FLAG fizzy card update --verbose type=bool
 FLAG fizzy card view --agent type=bool
 FLAG fizzy card view --api-url type=string
@@ -1926,6 +1956,220 @@ FLAG fizzy doctor --quiet type=bool
 FLAG fizzy doctor --styled type=bool
 FLAG fizzy doctor --token type=string
 FLAG fizzy doctor --verbose type=bool
+FLAG fizzy epic --agent type=bool
+FLAG fizzy epic --api-url type=string
+FLAG fizzy epic --count type=bool
+FLAG fizzy epic --help type=bool
+FLAG fizzy epic --ids-only type=bool
+FLAG fizzy epic --jq type=string
+FLAG fizzy epic --json type=bool
+FLAG fizzy epic --limit type=int
+FLAG fizzy epic --markdown type=bool
+FLAG fizzy epic --profile type=string
+FLAG fizzy epic --quiet type=bool
+FLAG fizzy epic --styled type=bool
+FLAG fizzy epic --token type=string
+FLAG fizzy epic --verbose type=bool
+FLAG fizzy epic add-card --agent type=bool
+FLAG fizzy epic add-card --api-url type=string
+FLAG fizzy epic add-card --board type=string
+FLAG fizzy epic add-card --card type=string
+FLAG fizzy epic add-card --count type=bool
+FLAG fizzy epic add-card --help type=bool
+FLAG fizzy epic add-card --ids-only type=bool
+FLAG fizzy epic add-card --jq type=string
+FLAG fizzy epic add-card --json type=bool
+FLAG fizzy epic add-card --limit type=int
+FLAG fizzy epic add-card --markdown type=bool
+FLAG fizzy epic add-card --profile type=string
+FLAG fizzy epic add-card --quiet type=bool
+FLAG fizzy epic add-card --styled type=bool
+FLAG fizzy epic add-card --token type=string
+FLAG fizzy epic add-card --verbose type=bool
+FLAG fizzy epic cards --agent type=bool
+FLAG fizzy epic cards --all type=bool
+FLAG fizzy epic cards --api-url type=string
+FLAG fizzy epic cards --board type=string
+FLAG fizzy epic cards --count type=bool
+FLAG fizzy epic cards --help type=bool
+FLAG fizzy epic cards --ids-only type=bool
+FLAG fizzy epic cards --jq type=string
+FLAG fizzy epic cards --json type=bool
+FLAG fizzy epic cards --limit type=int
+FLAG fizzy epic cards --markdown type=bool
+FLAG fizzy epic cards --page type=int
+FLAG fizzy epic cards --profile type=string
+FLAG fizzy epic cards --quiet type=bool
+FLAG fizzy epic cards --styled type=bool
+FLAG fizzy epic cards --token type=string
+FLAG fizzy epic cards --verbose type=bool
+FLAG fizzy epic create --agent type=bool
+FLAG fizzy epic create --api-url type=string
+FLAG fizzy epic create --board type=string
+FLAG fizzy epic create --color type=string
+FLAG fizzy epic create --count type=bool
+FLAG fizzy epic create --description type=string
+FLAG fizzy epic create --help type=bool
+FLAG fizzy epic create --ids-only type=bool
+FLAG fizzy epic create --jq type=string
+FLAG fizzy epic create --json type=bool
+FLAG fizzy epic create --limit type=int
+FLAG fizzy epic create --markdown type=bool
+FLAG fizzy epic create --name type=string
+FLAG fizzy epic create --no-wave type=bool
+FLAG fizzy epic create --owner type=string
+FLAG fizzy epic create --profile type=string
+FLAG fizzy epic create --quiet type=bool
+FLAG fizzy epic create --start type=string
+FLAG fizzy epic create --status type=string
+FLAG fizzy epic create --styled type=bool
+FLAG fizzy epic create --target type=string
+FLAG fizzy epic create --token type=string
+FLAG fizzy epic create --verbose type=bool
+FLAG fizzy epic create --wave type=string
+FLAG fizzy epic delete --agent type=bool
+FLAG fizzy epic delete --api-url type=string
+FLAG fizzy epic delete --board type=string
+FLAG fizzy epic delete --count type=bool
+FLAG fizzy epic delete --help type=bool
+FLAG fizzy epic delete --ids-only type=bool
+FLAG fizzy epic delete --jq type=string
+FLAG fizzy epic delete --json type=bool
+FLAG fizzy epic delete --limit type=int
+FLAG fizzy epic delete --markdown type=bool
+FLAG fizzy epic delete --profile type=string
+FLAG fizzy epic delete --quiet type=bool
+FLAG fizzy epic delete --styled type=bool
+FLAG fizzy epic delete --token type=string
+FLAG fizzy epic delete --verbose type=bool
+FLAG fizzy epic help --agent type=bool
+FLAG fizzy epic help --api-url type=string
+FLAG fizzy epic help --count type=bool
+FLAG fizzy epic help --help type=bool
+FLAG fizzy epic help --ids-only type=bool
+FLAG fizzy epic help --jq type=string
+FLAG fizzy epic help --json type=bool
+FLAG fizzy epic help --limit type=int
+FLAG fizzy epic help --markdown type=bool
+FLAG fizzy epic help --profile type=string
+FLAG fizzy epic help --quiet type=bool
+FLAG fizzy epic help --styled type=bool
+FLAG fizzy epic help --token type=string
+FLAG fizzy epic help --verbose type=bool
+FLAG fizzy epic list --agent type=bool
+FLAG fizzy epic list --api-url type=string
+FLAG fizzy epic list --board type=string
+FLAG fizzy epic list --count type=bool
+FLAG fizzy epic list --help type=bool
+FLAG fizzy epic list --ids-only type=bool
+FLAG fizzy epic list --jq type=string
+FLAG fizzy epic list --json type=bool
+FLAG fizzy epic list --limit type=int
+FLAG fizzy epic list --markdown type=bool
+FLAG fizzy epic list --profile type=string
+FLAG fizzy epic list --quiet type=bool
+FLAG fizzy epic list --styled type=bool
+FLAG fizzy epic list --token type=string
+FLAG fizzy epic list --verbose type=bool
+FLAG fizzy epic ls --agent type=bool
+FLAG fizzy epic ls --api-url type=string
+FLAG fizzy epic ls --board type=string
+FLAG fizzy epic ls --count type=bool
+FLAG fizzy epic ls --help type=bool
+FLAG fizzy epic ls --ids-only type=bool
+FLAG fizzy epic ls --jq type=string
+FLAG fizzy epic ls --json type=bool
+FLAG fizzy epic ls --limit type=int
+FLAG fizzy epic ls --markdown type=bool
+FLAG fizzy epic ls --profile type=string
+FLAG fizzy epic ls --quiet type=bool
+FLAG fizzy epic ls --styled type=bool
+FLAG fizzy epic ls --token type=string
+FLAG fizzy epic ls --verbose type=bool
+FLAG fizzy epic remove-card --agent type=bool
+FLAG fizzy epic remove-card --api-url type=string
+FLAG fizzy epic remove-card --card type=string
+FLAG fizzy epic remove-card --count type=bool
+FLAG fizzy epic remove-card --help type=bool
+FLAG fizzy epic remove-card --ids-only type=bool
+FLAG fizzy epic remove-card --jq type=string
+FLAG fizzy epic remove-card --json type=bool
+FLAG fizzy epic remove-card --limit type=int
+FLAG fizzy epic remove-card --markdown type=bool
+FLAG fizzy epic remove-card --profile type=string
+FLAG fizzy epic remove-card --quiet type=bool
+FLAG fizzy epic remove-card --styled type=bool
+FLAG fizzy epic remove-card --token type=string
+FLAG fizzy epic remove-card --verbose type=bool
+FLAG fizzy epic rm --agent type=bool
+FLAG fizzy epic rm --api-url type=string
+FLAG fizzy epic rm --board type=string
+FLAG fizzy epic rm --count type=bool
+FLAG fizzy epic rm --help type=bool
+FLAG fizzy epic rm --ids-only type=bool
+FLAG fizzy epic rm --jq type=string
+FLAG fizzy epic rm --json type=bool
+FLAG fizzy epic rm --limit type=int
+FLAG fizzy epic rm --markdown type=bool
+FLAG fizzy epic rm --profile type=string
+FLAG fizzy epic rm --quiet type=bool
+FLAG fizzy epic rm --styled type=bool
+FLAG fizzy epic rm --token type=string
+FLAG fizzy epic rm --verbose type=bool
+FLAG fizzy epic show --agent type=bool
+FLAG fizzy epic show --api-url type=string
+FLAG fizzy epic show --board type=string
+FLAG fizzy epic show --count type=bool
+FLAG fizzy epic show --help type=bool
+FLAG fizzy epic show --ids-only type=bool
+FLAG fizzy epic show --jq type=string
+FLAG fizzy epic show --json type=bool
+FLAG fizzy epic show --limit type=int
+FLAG fizzy epic show --markdown type=bool
+FLAG fizzy epic show --profile type=string
+FLAG fizzy epic show --quiet type=bool
+FLAG fizzy epic show --styled type=bool
+FLAG fizzy epic show --token type=string
+FLAG fizzy epic show --verbose type=bool
+FLAG fizzy epic update --agent type=bool
+FLAG fizzy epic update --api-url type=string
+FLAG fizzy epic update --board type=string
+FLAG fizzy epic update --color type=string
+FLAG fizzy epic update --count type=bool
+FLAG fizzy epic update --description type=string
+FLAG fizzy epic update --help type=bool
+FLAG fizzy epic update --ids-only type=bool
+FLAG fizzy epic update --jq type=string
+FLAG fizzy epic update --json type=bool
+FLAG fizzy epic update --limit type=int
+FLAG fizzy epic update --markdown type=bool
+FLAG fizzy epic update --name type=string
+FLAG fizzy epic update --no-wave type=bool
+FLAG fizzy epic update --owner type=string
+FLAG fizzy epic update --profile type=string
+FLAG fizzy epic update --quiet type=bool
+FLAG fizzy epic update --start type=string
+FLAG fizzy epic update --status type=string
+FLAG fizzy epic update --styled type=bool
+FLAG fizzy epic update --target type=string
+FLAG fizzy epic update --token type=string
+FLAG fizzy epic update --verbose type=bool
+FLAG fizzy epic update --wave type=string
+FLAG fizzy epic view --agent type=bool
+FLAG fizzy epic view --api-url type=string
+FLAG fizzy epic view --board type=string
+FLAG fizzy epic view --count type=bool
+FLAG fizzy epic view --help type=bool
+FLAG fizzy epic view --ids-only type=bool
+FLAG fizzy epic view --jq type=string
+FLAG fizzy epic view --json type=bool
+FLAG fizzy epic view --limit type=int
+FLAG fizzy epic view --markdown type=bool
+FLAG fizzy epic view --profile type=string
+FLAG fizzy epic view --quiet type=bool
+FLAG fizzy epic view --styled type=bool
+FLAG fizzy epic view --token type=string
+FLAG fizzy epic view --verbose type=bool
 FLAG fizzy help --agent type=bool
 FLAG fizzy help --api-url type=string
 FLAG fizzy help --count type=bool
@@ -3165,6 +3409,189 @@ FLAG fizzy version --quiet type=bool
 FLAG fizzy version --styled type=bool
 FLAG fizzy version --token type=string
 FLAG fizzy version --verbose type=bool
+FLAG fizzy wave --agent type=bool
+FLAG fizzy wave --api-url type=string
+FLAG fizzy wave --count type=bool
+FLAG fizzy wave --help type=bool
+FLAG fizzy wave --ids-only type=bool
+FLAG fizzy wave --jq type=string
+FLAG fizzy wave --json type=bool
+FLAG fizzy wave --limit type=int
+FLAG fizzy wave --markdown type=bool
+FLAG fizzy wave --profile type=string
+FLAG fizzy wave --quiet type=bool
+FLAG fizzy wave --styled type=bool
+FLAG fizzy wave --token type=string
+FLAG fizzy wave --verbose type=bool
+FLAG fizzy wave create --agent type=bool
+FLAG fizzy wave create --api-url type=string
+FLAG fizzy wave create --board type=string
+FLAG fizzy wave create --color type=string
+FLAG fizzy wave create --count type=bool
+FLAG fizzy wave create --description type=string
+FLAG fizzy wave create --epic type=stringSlice
+FLAG fizzy wave create --help type=bool
+FLAG fizzy wave create --ids-only type=bool
+FLAG fizzy wave create --jq type=string
+FLAG fizzy wave create --json type=bool
+FLAG fizzy wave create --limit type=int
+FLAG fizzy wave create --markdown type=bool
+FLAG fizzy wave create --name type=string
+FLAG fizzy wave create --no-epics type=bool
+FLAG fizzy wave create --owner type=string
+FLAG fizzy wave create --phase type=string
+FLAG fizzy wave create --profile type=string
+FLAG fizzy wave create --quiet type=bool
+FLAG fizzy wave create --start type=string
+FLAG fizzy wave create --styled type=bool
+FLAG fizzy wave create --target type=string
+FLAG fizzy wave create --token type=string
+FLAG fizzy wave create --verbose type=bool
+FLAG fizzy wave delete --agent type=bool
+FLAG fizzy wave delete --api-url type=string
+FLAG fizzy wave delete --board type=string
+FLAG fizzy wave delete --count type=bool
+FLAG fizzy wave delete --help type=bool
+FLAG fizzy wave delete --ids-only type=bool
+FLAG fizzy wave delete --jq type=string
+FLAG fizzy wave delete --json type=bool
+FLAG fizzy wave delete --limit type=int
+FLAG fizzy wave delete --markdown type=bool
+FLAG fizzy wave delete --profile type=string
+FLAG fizzy wave delete --quiet type=bool
+FLAG fizzy wave delete --styled type=bool
+FLAG fizzy wave delete --token type=string
+FLAG fizzy wave delete --verbose type=bool
+FLAG fizzy wave help --agent type=bool
+FLAG fizzy wave help --api-url type=string
+FLAG fizzy wave help --count type=bool
+FLAG fizzy wave help --help type=bool
+FLAG fizzy wave help --ids-only type=bool
+FLAG fizzy wave help --jq type=string
+FLAG fizzy wave help --json type=bool
+FLAG fizzy wave help --limit type=int
+FLAG fizzy wave help --markdown type=bool
+FLAG fizzy wave help --profile type=string
+FLAG fizzy wave help --quiet type=bool
+FLAG fizzy wave help --styled type=bool
+FLAG fizzy wave help --token type=string
+FLAG fizzy wave help --verbose type=bool
+FLAG fizzy wave list --agent type=bool
+FLAG fizzy wave list --api-url type=string
+FLAG fizzy wave list --board type=string
+FLAG fizzy wave list --count type=bool
+FLAG fizzy wave list --help type=bool
+FLAG fizzy wave list --ids-only type=bool
+FLAG fizzy wave list --jq type=string
+FLAG fizzy wave list --json type=bool
+FLAG fizzy wave list --limit type=int
+FLAG fizzy wave list --markdown type=bool
+FLAG fizzy wave list --profile type=string
+FLAG fizzy wave list --quiet type=bool
+FLAG fizzy wave list --styled type=bool
+FLAG fizzy wave list --token type=string
+FLAG fizzy wave list --verbose type=bool
+FLAG fizzy wave ls --agent type=bool
+FLAG fizzy wave ls --api-url type=string
+FLAG fizzy wave ls --board type=string
+FLAG fizzy wave ls --count type=bool
+FLAG fizzy wave ls --help type=bool
+FLAG fizzy wave ls --ids-only type=bool
+FLAG fizzy wave ls --jq type=string
+FLAG fizzy wave ls --json type=bool
+FLAG fizzy wave ls --limit type=int
+FLAG fizzy wave ls --markdown type=bool
+FLAG fizzy wave ls --profile type=string
+FLAG fizzy wave ls --quiet type=bool
+FLAG fizzy wave ls --styled type=bool
+FLAG fizzy wave ls --token type=string
+FLAG fizzy wave ls --verbose type=bool
+FLAG fizzy wave phase --agent type=bool
+FLAG fizzy wave phase --api-url type=string
+FLAG fizzy wave phase --board type=string
+FLAG fizzy wave phase --count type=bool
+FLAG fizzy wave phase --help type=bool
+FLAG fizzy wave phase --ids-only type=bool
+FLAG fizzy wave phase --jq type=string
+FLAG fizzy wave phase --json type=bool
+FLAG fizzy wave phase --limit type=int
+FLAG fizzy wave phase --markdown type=bool
+FLAG fizzy wave phase --next type=bool
+FLAG fizzy wave phase --profile type=string
+FLAG fizzy wave phase --quiet type=bool
+FLAG fizzy wave phase --set type=string
+FLAG fizzy wave phase --styled type=bool
+FLAG fizzy wave phase --token type=string
+FLAG fizzy wave phase --verbose type=bool
+FLAG fizzy wave rm --agent type=bool
+FLAG fizzy wave rm --api-url type=string
+FLAG fizzy wave rm --board type=string
+FLAG fizzy wave rm --count type=bool
+FLAG fizzy wave rm --help type=bool
+FLAG fizzy wave rm --ids-only type=bool
+FLAG fizzy wave rm --jq type=string
+FLAG fizzy wave rm --json type=bool
+FLAG fizzy wave rm --limit type=int
+FLAG fizzy wave rm --markdown type=bool
+FLAG fizzy wave rm --profile type=string
+FLAG fizzy wave rm --quiet type=bool
+FLAG fizzy wave rm --styled type=bool
+FLAG fizzy wave rm --token type=string
+FLAG fizzy wave rm --verbose type=bool
+FLAG fizzy wave show --agent type=bool
+FLAG fizzy wave show --api-url type=string
+FLAG fizzy wave show --board type=string
+FLAG fizzy wave show --count type=bool
+FLAG fizzy wave show --help type=bool
+FLAG fizzy wave show --ids-only type=bool
+FLAG fizzy wave show --jq type=string
+FLAG fizzy wave show --json type=bool
+FLAG fizzy wave show --limit type=int
+FLAG fizzy wave show --markdown type=bool
+FLAG fizzy wave show --profile type=string
+FLAG fizzy wave show --quiet type=bool
+FLAG fizzy wave show --styled type=bool
+FLAG fizzy wave show --token type=string
+FLAG fizzy wave show --verbose type=bool
+FLAG fizzy wave update --agent type=bool
+FLAG fizzy wave update --api-url type=string
+FLAG fizzy wave update --board type=string
+FLAG fizzy wave update --color type=string
+FLAG fizzy wave update --count type=bool
+FLAG fizzy wave update --description type=string
+FLAG fizzy wave update --epic type=stringSlice
+FLAG fizzy wave update --help type=bool
+FLAG fizzy wave update --ids-only type=bool
+FLAG fizzy wave update --jq type=string
+FLAG fizzy wave update --json type=bool
+FLAG fizzy wave update --limit type=int
+FLAG fizzy wave update --markdown type=bool
+FLAG fizzy wave update --name type=string
+FLAG fizzy wave update --no-epics type=bool
+FLAG fizzy wave update --owner type=string
+FLAG fizzy wave update --phase type=string
+FLAG fizzy wave update --profile type=string
+FLAG fizzy wave update --quiet type=bool
+FLAG fizzy wave update --start type=string
+FLAG fizzy wave update --styled type=bool
+FLAG fizzy wave update --target type=string
+FLAG fizzy wave update --token type=string
+FLAG fizzy wave update --verbose type=bool
+FLAG fizzy wave view --agent type=bool
+FLAG fizzy wave view --api-url type=string
+FLAG fizzy wave view --board type=string
+FLAG fizzy wave view --count type=bool
+FLAG fizzy wave view --help type=bool
+FLAG fizzy wave view --ids-only type=bool
+FLAG fizzy wave view --jq type=string
+FLAG fizzy wave view --json type=bool
+FLAG fizzy wave view --limit type=int
+FLAG fizzy wave view --markdown type=bool
+FLAG fizzy wave view --profile type=string
+FLAG fizzy wave view --quiet type=bool
+FLAG fizzy wave view --styled type=bool
+FLAG fizzy wave view --token type=string
+FLAG fizzy wave view --verbose type=bool
 FLAG fizzy webhook --agent type=bool
 FLAG fizzy webhook --api-url type=string
 FLAG fizzy webhook --count type=bool
@@ -3465,6 +3892,19 @@ SUB fizzy config help
 SUB fizzy config show
 SUB fizzy config view
 SUB fizzy doctor
+SUB fizzy epic
+SUB fizzy epic add-card
+SUB fizzy epic cards
+SUB fizzy epic create
+SUB fizzy epic delete
+SUB fizzy epic help
+SUB fizzy epic list
+SUB fizzy epic ls
+SUB fizzy epic remove-card
+SUB fizzy epic rm
+SUB fizzy epic show
+SUB fizzy epic update
+SUB fizzy epic view
 SUB fizzy help
 SUB fizzy identity
 SUB fizzy identity help
@@ -3549,6 +3989,17 @@ SUB fizzy user show
 SUB fizzy user update
 SUB fizzy user view
 SUB fizzy version
+SUB fizzy wave
+SUB fizzy wave create
+SUB fizzy wave delete
+SUB fizzy wave help
+SUB fizzy wave list
+SUB fizzy wave ls
+SUB fizzy wave phase
+SUB fizzy wave rm
+SUB fizzy wave show
+SUB fizzy wave update
+SUB fizzy wave view
 SUB fizzy webhook
 SUB fizzy webhook create
 SUB fizzy webhook delete

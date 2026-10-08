@@ -71,3 +71,21 @@ func TestPrintHumanErrorUsesCommandSpecificHelp(t *testing.T) {
 		t.Fatalf("expected root usage hint to be omitted, got:\n%s", out)
 	}
 }
+
+func TestAccountFlagIsDeprecatedAliasForProfile(t *testing.T) {
+	flag := rootCmd.PersistentFlags().Lookup("account")
+	if flag == nil {
+		t.Fatal("expected a persistent --account flag")
+	}
+	if flag.Deprecated == "" {
+		t.Error("expected --account to be marked deprecated")
+	}
+
+	defer func() { cfgProfile = "" }()
+	if err := rootCmd.PersistentFlags().Set("account", "7"); err != nil {
+		t.Fatalf("setting --account: %v", err)
+	}
+	if cfgProfile != "7" {
+		t.Errorf("expected --account to set the profile, got %q", cfgProfile)
+	}
+}
