@@ -410,6 +410,9 @@ func usageHelpCommand(cmd *cobra.Command) string {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgToken, "token", "", "API access token")
 	rootCmd.PersistentFlags().StringVar(&cfgProfile, "profile", "", "Named profile to use")
+	// v3 compatibility: scripts still pass --account; it selects the same profile.
+	rootCmd.PersistentFlags().StringVar(&cfgProfile, "account", "", "Deprecated alias for --profile")
+	_ = rootCmd.PersistentFlags().MarkDeprecated("account", "use --profile instead")
 	rootCmd.PersistentFlags().StringVar(&cfgAPIURL, "api-url", "", "API base URL")
 	rootCmd.PersistentFlags().BoolVar(&cfgVerbose, "verbose", false, "Show request/response details")
 	rootCmd.PersistentFlags().BoolVar(&cfgJSON, "json", false, "JSON envelope output")

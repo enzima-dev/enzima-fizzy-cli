@@ -594,6 +594,8 @@ fizzy card create --board ID --title "Title" [flags]
   --image SIGNED_ID                    # Header image (use signed_id from upload)
   --tag-ids "id1,id2"                  # Comma-separated tag IDs
   --created-at TIMESTAMP               # Custom created_at
+  --type feature|bug|chore             # Card type (enzima fork)
+  --epic EPIC_ID                       # Put the card in an epic (enzima fork)
 
 fizzy card update CARD_NUMBER [flags]
   --title "Title"
@@ -602,6 +604,8 @@ fizzy card update CARD_NUMBER [flags]
   --attach PATH
   --image SIGNED_ID
   --created-at TIMESTAMP
+  --type feature|bug|chore
+  --epic EPIC_ID                       # Clear with: fizzy epic remove-card --card N
 
 fizzy card delete CARD_NUMBER
 ```
@@ -660,6 +664,40 @@ fizzy column update COLUMN_ID --board ID [--name "Name"] [--color HEX]
 fizzy column delete COLUMN_ID --board ID
 fizzy column move-left COLUMN_ID             # Move column one position left
 fizzy column move-right COLUMN_ID            # Move column one position right
+```
+
+### Epics (Enzima fork)
+
+Epics group cards toward a bigger outcome. They belong to a board and can sit inside a wave.
+Requires the Enzima Fizzy fork (the upstream API has no epics).
+
+```bash
+fizzy epic list --board ID
+fizzy epic show EPIC_ID --board ID
+fizzy epic create --board ID --name "Name" [--description TEXT] [--color NAME] [--owner USER_ID] \
+  [--start YYYY-MM-DD] [--target YYYY-MM-DD] [--status not_started|in_progress|completed] [--wave WAVE_ID]
+fizzy epic update EPIC_ID --board ID [same flags] [--no-wave]   # --no-wave takes it out of its wave
+fizzy epic delete EPIC_ID --board ID                             # cards stay, just unlinked
+fizzy epic cards EPIC_ID --board ID [--page N] [--all]
+fizzy epic add-card EPIC_ID --board ID --card NUMBER             # replaces the card's current epic
+fizzy epic remove-card --card NUMBER
+```
+
+### Waves (Enzima fork)
+
+Waves sit above epics (Project › Wave › Epic › Card): overlapping development cycles with a
+manual phase. Phases, in order: `discovery`, `design`, `prototype`, `validation`, `setup`, `evolution`.
+Progress is derived from the cards of the wave's epics.
+
+```bash
+fizzy wave list --board ID
+fizzy wave show WAVE_ID --board ID                               # includes epic_ids
+fizzy wave create --board ID --name "Name" [--description TEXT] [--color NAME] [--owner USER_ID] \
+  [--start YYYY-MM-DD] [--target YYYY-MM-DD] [--phase PHASE] [--epic EPIC_ID ...]
+fizzy wave update WAVE_ID --board ID [same flags] [--no-epics]  # --epic REPLACES the wave's epics
+fizzy wave delete WAVE_ID --board ID                             # epics stay, just without a wave
+fizzy wave phase WAVE_ID --board ID --next                       # advance one phase
+fizzy wave phase WAVE_ID --board ID --set validation
 ```
 
 ### Comments

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -222,6 +223,8 @@ var cardCreateDescriptionFile string
 var cardCreateAttach []string
 var cardCreateImage string
 var cardCreateCreatedAt string
+var cardCreateType string
+var cardCreateEpic string
 
 var cardCreateCmd = &cobra.Command{
 	Use:   "create",
@@ -238,6 +241,10 @@ var cardCreateCmd = &cobra.Command{
 		}
 		if cardCreateTitle == "" {
 			return newRequiredFlagError("title")
+		}
+		classification, err := cardClassification(cardCreateType, cardCreateEpic)
+		if err != nil {
+			return err
 		}
 
 		description, err := resolveRichTextContent(cardCreateDescription, cardCreateDescriptionFile)
@@ -290,6 +297,16 @@ var cardCreateCmd = &cobra.Command{
 			}
 		}
 
+		if len(classification) > 0 && cardNumber != "" {
+			classified, classifyErr := classifyCard(cmd, cardNumber, classification)
+			if classifyErr != nil {
+				return classifyErr
+			}
+			if classified != nil {
+				items = classified
+			}
+		}
+
 		// Build breadcrumbs
 		var breadcrumbs []Breadcrumb
 		if cardNumber != "" {
@@ -316,6 +333,8 @@ var cardUpdateDescriptionFile string
 var cardUpdateAttach []string
 var cardUpdateImage string
 var cardUpdateCreatedAt string
+var cardUpdateType string
+var cardUpdateEpic string
 
 var cardUpdateCmd = &cobra.Command{
 	Use:   "update CARD_NUMBER",
@@ -328,6 +347,11 @@ var cardUpdateCmd = &cobra.Command{
 		}
 
 		cardNumber := args[0]
+
+		classification, err := cardClassification(cardUpdateType, cardUpdateEpic)
+		if err != nil {
+			return err
+		}
 
 		hasDescriptionInput := cardUpdateDescription != "" || cardUpdateDescriptionFile != ""
 		description, err := resolveRichTextContent(cardUpdateDescription, cardUpdateDescriptionFile)
@@ -371,13 +395,55 @@ var cardUpdateCmd = &cobra.Command{
 			req.CreatedAt = cardUpdateCreatedAt
 		}
 
-		data, _, err := getSDK().Cards().Update(cmd.Context(), cardNumber, req)
-		if err != nil {
-			return convertSDKError(err)
+		hasContentChanges := req.Title != "" || req.Description != "" || req.Image != "" || req.CreatedAt != ""
+		var result any
+		if hasContentChanges || len(classification) == 0 {
+			data, _, updateErr := getSDK().Cards().Update(cmd.Context(), cardNumber, req)
+			if updateErr != nil {
+				return convertSDKError(updateErr)
+			}
+			result = normalizeAny(data)
 		}
-		printMutation(normalizeAny(data), "", breadcrumbs)
+		if len(classification) > 0 {
+			classified, classifyErr := classifyCard(cmd, cardNumber, classification)
+			if classifyErr != nil {
+				return classifyErr
+			}
+			if classified != nil {
+				result = classified
+			}
+		}
+		printMutation(result, "", breadcrumbs)
 		return nil
 	},
+}
+
+var cardTypes = []string{"feature", "bug", "chore"}
+
+// cardClassification builds the card_type/epic_id attributes the SDK requests don't carry.
+func cardClassification(cardType, epicID string) (map[string]any, error) {
+	fields := map[string]any{}
+	if cardType != "" {
+		if !slices.Contains(cardTypes, cardType) {
+			return nil, errors.NewInvalidArgsError("--type must be one of: " + strings.Join(cardTypes, ", "))
+		}
+		fields["card_type"] = cardType
+	}
+	if epicID != "" {
+		fields["epic_id"] = epicID
+	}
+	return fields, nil
+}
+
+func classifyCard(cmd *cobra.Command, cardNumber string, fields map[string]any) (any, error) {
+	resp, err := getSDK().Patch(cmd.Context(), "/cards/"+cardNumber+".json", map[string]any{"card": fields})
+	if err != nil {
+		return nil, convertSDKError(err)
+	}
+	if resp == nil {
+		return nil, nil
+	}
+	return normalizeAny(resp.Data), nil
 }
 
 var cardDeleteCmd = &cobra.Command{
@@ -1064,6 +1130,8 @@ func init() {
 	cardCreateCmd.Flags().StringArrayVar(&cardCreateAttach, "attach", nil, "Upload and append inline attachment at the end of the description. Repeatable.")
 	cardCreateCmd.Flags().StringVar(&cardCreateImage, "image", "", "Header image signed ID")
 	cardCreateCmd.Flags().StringVar(&cardCreateCreatedAt, "created-at", "", "Custom created_at timestamp")
+	cardCreateCmd.Flags().StringVar(&cardCreateType, "type", "", "Card type (feature, bug, chore)")
+	cardCreateCmd.Flags().StringVar(&cardCreateEpic, "epic", "", "Epic ID to put the card in")
 	cardCmd.AddCommand(cardCreateCmd)
 
 	// Update
@@ -1073,6 +1141,8 @@ func init() {
 	cardUpdateCmd.Flags().StringArrayVar(&cardUpdateAttach, "attach", nil, "Upload and append inline attachment at the end of the description. Repeatable.")
 	cardUpdateCmd.Flags().StringVar(&cardUpdateImage, "image", "", "Header image signed ID")
 	cardUpdateCmd.Flags().StringVar(&cardUpdateCreatedAt, "created-at", "", "Custom created_at timestamp")
+	cardUpdateCmd.Flags().StringVar(&cardUpdateType, "type", "", "Card type (feature, bug, chore)")
+	cardUpdateCmd.Flags().StringVar(&cardUpdateEpic, "epic", "", "Epic ID to put the card in")
 	cardCmd.AddCommand(cardUpdateCmd)
 
 	// Delete
