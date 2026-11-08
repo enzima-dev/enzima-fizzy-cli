@@ -52,13 +52,17 @@ var cardListCmd = &cobra.Command{
 
 		ac := getSDK()
 		path := "/cards.json"
+		inBoardOrder := cardListUsesBoardColumnOrder(boardID, columnFilter, indexedByFilter)
 
 		var params []string
-		if boardID != "" {
+		if inBoardOrder {
+			path = "/boards/" + boardID + "/columns/" + columnFilter + "/cards.json"
+		}
+		if boardID != "" && !inBoardOrder {
 			params = append(params, "board_ids[]="+boardID)
 		}
 
-		if columnFilter != "" {
+		if columnFilter != "" && !inBoardOrder {
 			if pseudo, ok := parsePseudoColumnID(columnFilter); ok {
 				switch pseudo.Kind {
 				case "not_now":
@@ -160,6 +164,9 @@ var cardListCmd = &cobra.Command{
 			breadcrumb("create", "fizzy card create --board <id> --title \"title\"", "Create new card"),
 			breadcrumb("search", "fizzy search \"query\"", "Search cards"),
 		}
+		if inBoardOrder {
+			breadcrumbs = append(breadcrumbs, breadcrumb("position", "fizzy card position <number> --after <number>", "Reorder a card in this column"))
+		}
 
 		hasNext := linkNext != ""
 		if hasNext {
@@ -173,6 +180,19 @@ var cardListCmd = &cobra.Command{
 		printListPaginated(items, cardColumns, hasNext, linkNext, cardListAll, summary, breadcrumbs)
 		return nil
 	},
+}
+
+// cardListUsesBoardColumnOrder reports whether the list can come from the board's column endpoint,
+// which returns cards in the order shown on the board but accepts no filter besides the column.
+func cardListUsesBoardColumnOrder(boardID, columnFilter, indexedByFilter string) bool {
+	if boardID == "" || columnFilter == "" || indexedByFilter != "" {
+		return false
+	}
+	if _, pseudo := parsePseudoColumnID(columnFilter); pseudo {
+		return false
+	}
+	return cardListTag == "" && cardListAssignee == "" && cardListSearch == "" && cardListSort == "" &&
+		cardListCreator == "" && cardListCloser == "" && !cardListUnassigned && cardListCreated == "" && cardListClosed == ""
 }
 
 var cardShowCmd = &cobra.Command{
@@ -608,12 +628,17 @@ var cardMoveCmd = &cobra.Command{
 
 // Card column flags
 var cardColumnColumn string
+var cardColumnPlacement cardPlacement
 
 var cardColumnCmd = &cobra.Command{
 	Use:   "column CARD_NUMBER",
 	Short: "Move card to column",
-	Long:  "Moves a card to a specific column.",
-	Args:  cobra.ExactArgs(1),
+	Long: `Moves a card to a specific column. A card entering a column lands at the bottom;
+pass --before, --after, --top or --bottom to place it in the same call.`,
+	Example: `  fizzy card column 1579 --column <column_id>
+  fizzy card column 1579 --column <column_id> --top
+  fizzy card column 1580 --column <column_id> --after 1579`,
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := requireAuthAndAccount(); err != nil {
 			return err
@@ -621,6 +646,18 @@ var cardColumnCmd = &cobra.Command{
 
 		if cardColumnColumn == "" {
 			return newRequiredFlagError("column")
+		}
+
+		var placement map[string]any
+		if cardColumnPlacement.given() {
+			body, err := cardColumnPlacement.body()
+			if err != nil {
+				return err
+			}
+			if _, ok := parsePseudoColumnID(cardColumnColumn); ok {
+				return errors.NewInvalidArgsError("--before, --after, --top and --bottom only apply to workflow columns")
+			}
+			placement = body
 		}
 
 		cardNumber := args[0]
@@ -666,7 +703,19 @@ var cardColumnCmd = &cobra.Command{
 			return convertSDKError(err)
 		}
 
-		printMutation(map[string]any{}, "", breadcrumbs)
+		if placement == nil {
+			breadcrumbs = append(breadcrumbs, breadcrumb("position", fmt.Sprintf("fizzy card position %s --top", cardNumber), "Reorder card in its column"))
+			printMutation(map[string]any{}, "", breadcrumbs)
+			return nil
+		}
+
+		card, err := positionCard(cmd, cardNumber, placement)
+		if err != nil {
+			return err
+		}
+
+		summary := fmt.Sprintf("Card #%s moved to column and placed %s", cardNumber, cardColumnPlacement.describe())
+		printMutation(card, summary, cardPositionBreadcrumbs(cardNumber))
 		return nil
 	},
 }
@@ -1102,7 +1151,7 @@ func init() {
 
 	// List
 	cardListCmd.Flags().StringVar(&cardListBoard, "board", "", "Filter by board ID")
-	cardListCmd.Flags().StringVar(&cardListColumn, "column", "", "Filter by column ID or pseudo column (not-now, maybe, done)")
+	cardListCmd.Flags().StringVar(&cardListColumn, "column", "", "Filter by column ID or pseudo column (not-now, maybe, done); with --board, cards come in board order")
 	cardListCmd.Flags().StringVar(&cardListTag, "tag", "", "Filter by tag ID")
 	cardListCmd.Flags().StringVar(&cardListIndexedBy, "indexed-by", "", "Filter by lane/index (all, closed, maybe, not_now, stalled, postponing_soon, golden)")
 	cardListCmd.Flags().StringVar(&cardListIndexedBy, "status", "", "Alias for --indexed-by")
@@ -1159,6 +1208,7 @@ func init() {
 
 	// Column
 	cardColumnCmd.Flags().StringVar(&cardColumnColumn, "column", "", "Column ID (required)")
+	cardColumnPlacement.addFlags(cardColumnCmd)
 	cardCmd.AddCommand(cardColumnCmd)
 
 	// Untriage
