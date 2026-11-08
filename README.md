@@ -31,6 +31,9 @@ This fork adds commands for the resources that only exist in the
   add/remove a card to/from an epic
 - `fizzy wave …` — list/show/create/update/delete waves (Project › Wave › Epic › Card),
   assign epics to a wave, change or advance its phase
+- `fizzy card position NUMBER --top|--bottom|--before N|--after N` — reorder a card within
+  its column; `fizzy card column` takes the same flags to move and place in one call, and
+  `fizzy card list --board B --column C` lists the column in board order
 
 Install from source: `make build && cp bin/fizzy ~/.local/bin/fizzy`.
 

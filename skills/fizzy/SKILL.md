@@ -87,7 +87,8 @@ Need to find something?
 
 ```
 Want to change something?
-├── Move to column? → fizzy card column <number> --column <id>
+├── Move to column? → fizzy card column <number> --column <id> [--top|--bottom|--before N|--after N]
+├── Reorder in column? → fizzy card position <number> --top|--bottom|--before N|--after N
 ├── Change status? → fizzy card close|reopen|postpone <number>
 ├── Assign? → fizzy card assign <number> --user <id>
 ├── Comment? → fizzy comment create --card <number> --body "text"
@@ -102,7 +103,7 @@ Want to change something?
 | account | - | `account show` | - | `account settings-update` | - | `account entropy`, `account export-create`, `account export-show EXPORT_ID`, `account join-code-show`, `account join-code-reset`, `account join-code-update` |
 | identity | - | `identity show` | - | `identity timezone-update --timezone NAME` | - | - |
 | board | `board list` | `board show ID` | `board create` | `board update ID` | `board delete ID` | `board accesses --board ID`, `board publish ID`, `board unpublish ID`, `board entropy ID`, `board closed`, `board postponed`, `board stream`, `board involvement ID`, `migrate board ID` |
-| card | `card list` | `card show NUMBER` | `card create` | `card update NUMBER` | `card delete NUMBER` | `card move NUMBER`, `card publish NUMBER`, `card mark-read NUMBER`, `card mark-unread NUMBER` |
+| card | `card list` | `card show NUMBER` | `card create` | `card update NUMBER` | `card delete NUMBER` | `card move NUMBER`, `card position NUMBER`, `card publish NUMBER`, `card mark-read NUMBER`, `card mark-unread NUMBER` |
 | search | `search QUERY` | - | - | - | - | - |
 | activity | `activity list` | - | - | - | - | `activity list --board ID`, `activity list --creator ID` |
 | column | `column list --board ID` | `column show ID --board ID` | `column create` | `column update ID` | `column delete ID` | `column move-left ID`, `column move-right ID` |
@@ -367,6 +368,12 @@ fizzy card list --column not-now   # Same as --indexed-by not_now
 fizzy card list --column maybe     # Same as --indexed-by maybe
 ```
 
+**Board order of a column (Enzima fork):** `fizzy card list --board BOARD_ID --column COLUMN_ID` returns the
+column's cards in the order shown on the board (golden first, then the manual order, or by activity when the
+user turned on the column's auto-sort). The order holds only without other filters (`--tag`, `--assignee`,
+`--search`, `--sort`, ...); with them the CLI falls back to the regular search, sorted by `--sort`.
+Each card carries `position` (float, lower is higher in the column; `null` outside workflow columns).
+
 **Fetching all cards on a board:**
 
 To get all cards regardless of status (for example, to build a complete board view), make separate queries:
@@ -628,6 +635,9 @@ fizzy card untriage CARD_NUMBER        # Remove from column, back to triage
 
 ```bash
 fizzy card column CARD_NUMBER --column ID     # Move to column (use column ID or: maybe, not-now, done)
+fizzy card column CARD_NUMBER --column ID --top   # ...and place it; also --bottom, --before N, --after N (enzima fork)
+fizzy card position CARD_NUMBER --top         # Reorder within its column (enzima fork): exactly one of
+fizzy card position CARD_NUMBER --after N     #   --top, --bottom, --before N, --after N (N = card number, same column)
 fizzy card move CARD_NUMBER --to BOARD_ID     # Move card to a different board
 fizzy card assign CARD_NUMBER --user ID       # Toggle user assignment
 fizzy card self-assign CARD_NUMBER            # Toggle current user's assignment
